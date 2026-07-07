@@ -6,6 +6,10 @@ from user_to_model_level import encode_input
 
 app = FastAPI(title="Customer Churn Prediction")
 
+@app.get("/")
+def root():
+    return {"message": "Customer Churn Prediction API is live!", "docs": "/docs", "health": "/health"}
+
 # Load ensemble model
 model = joblib.load("models/voting_soft.pkl")
 

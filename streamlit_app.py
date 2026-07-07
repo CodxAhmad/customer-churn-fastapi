@@ -135,9 +135,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ── FastAPI endpoint ───────────────────────────────────────────────────────────
-# In production: set BACKEND_URL env var on Streamlit Cloud to your Render URL
-# e.g. https://customer-churn-api.onrender.com
-API_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000") + "/predict"
+# Defaults to the live Render backend; override with BACKEND_URL env var for local dev
+API_URL = os.getenv("BACKEND_URL", "https://customer-churn-fastapi-vwp1.onrender.com") + "/predict"
 
 # ── Sidebar ────────────────────────────────────────────────────────────────────
 with st.sidebar:
