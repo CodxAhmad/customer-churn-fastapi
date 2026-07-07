@@ -17,9 +17,14 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 from data_prep import load_and_prep_data
 
-# Set up DagsHub credentials for MLflow
-os.environ["MLFLOW_TRACKING_USERNAME"] = "ahmadtanveer2375"
-os.environ["MLFLOW_TRACKING_PASSWORD"] = "42a1f62dcefcb1159c35638f2a9a5eab514222c7"
+from dotenv import load_dotenv
+
+# Set up DagsHub credentials for MLflow securely
+load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
+
+# Fallback to hardcoded for testing if env vars aren't set
+os.environ["MLFLOW_TRACKING_USERNAME"] = os.getenv("MLFLOW_TRACKING_USERNAME", "ahmadtanveer2375")
+os.environ["MLFLOW_TRACKING_PASSWORD"] = os.getenv("MLFLOW_TRACKING_PASSWORD", "42a1f62dcefcb1159c35638f2a9a5eab514222c7")
 
 mlflow.set_tracking_uri("https://dagshub.com/ahmadtanveer2375/Customer_Churn_Track.mlflow/")
 mlflow.set_experiment("Churn_Prediction_Ensemble")

@@ -9,3 +9,4 @@ scikit-learn
 scipy
 joblib
 xgboost
+python-dotenv
