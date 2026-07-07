@@ -1,0 +1,11 @@
+# Backend dependencies only (used by Render)
+fastapi
+uvicorn[standard]
+pydantic
+
+numpy
+pandas
+scikit-learn
+scipy
+joblib
+xgboost

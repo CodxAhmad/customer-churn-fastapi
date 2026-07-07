@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import requests
 import plotly.graph_objects as go
@@ -134,7 +135,9 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ── FastAPI endpoint ───────────────────────────────────────────────────────────
-API_URL = "http://127.0.0.1:8000/predict"
+# In production: set BACKEND_URL env var on Streamlit Cloud to your Render URL
+# e.g. https://customer-churn-api.onrender.com
+API_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000") + "/predict"
 
 # ── Sidebar ────────────────────────────────────────────────────────────────────
 with st.sidebar:
