@@ -1,53 +1,101 @@
-# Customer Churn Prediction - End-to-End MLOps Project
+# 🚀 Telco Customer Churn Prediction: End-to-End MLOps Pipeline
 
-![Streamlit UI](https://img.shields.io/badge/UI-Streamlit-FF4B4B?style=flat&logo=streamlit&logoColor=white)
-![Backend](https://img.shields.io/badge/Backend-FastAPI-009688?style=flat&logo=fastapi&logoColor=white)
-![Tracking](https://img.shields.io/badge/Tracking-MLflow-0194E2?style=flat&logo=mlflow&logoColor=white)
-![Data Versioning](https://img.shields.io/badge/Versioning-DVC-13ADC7?style=flat&logo=dvc&logoColor=white)
-![Monitoring](https://img.shields.io/badge/Monitoring-Evidently_AI-FFA500?style=flat)
+![Streamlit](https://img.shields.io/badge/UI-Streamlit-FF4B4B?style=flat&logo=streamlit&logoColor=white)
+![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=flat&logo=fastapi&logoColor=white)
+![MLflow](https://img.shields.io/badge/Tracking-MLflow-0194E2?style=flat&logo=mlflow&logoColor=white)
+![DVC](https://img.shields.io/badge/Versioning-DVC-13ADC7?style=flat&logo=dvc&logoColor=white)
+![Evidently AI](https://img.shields.io/badge/Monitoring-Evidently_AI-FFA500?style=flat)
+![Deployment](https://img.shields.io/badge/Deployment-Render_%7C_Streamlit_Cloud-blue?style=flat)
 
-This project demonstrates a production-grade, end-to-end Machine Learning system for predicting telecommunications customer churn. It spans the entire MLOps lifecycle from data versioning to real-time model monitoring.
-
-## 🚀 Live Demo
-
-- **Frontend (Streamlit)**: [https://customer-churn-fastapi.streamlit.app](https://customer-churn-fastapi.streamlit.app)
-- **Backend (FastAPI Docs)**: [https://customer-churn-fastapi-vwp1.onrender.com/docs](https://customer-churn-fastapi-vwp1.onrender.com/docs)
+Welcome to the **End-to-End Machine Learning Operations (MLOps) Project**. This repository is not just a Jupyter Notebook; it is a fully functional, production-ready ML system built using modern software engineering and MLOps best practices. It predicts whether a telecommunications customer will churn (leave the service) based on their account and demographic data.
 
 ---
 
-## 🏗️ Architecture
+## 🔗 Live Project Links
 
-This project is built using a modern decoupled microservice architecture:
+Explore the live, deployed project and tracking dashboards:
 
-1. **Machine Learning Pipeline**: Data preprocessing, scaling, and ensemble modeling (Logistic Regression, Random Forest, XGBoost) using `scikit-learn`.
-2. **Experiment Tracking**: **MLflow** integrated with **DagsHub** tracks hyperparameters, evaluation metrics (ROC-AUC, Accuracy), and serialized models.
-3. **Data Versioning**: **DVC** handles versioning of large datasets and model artifacts (`scaler.pkl`, `voting_soft.pkl`), keeping Git lean.
-4. **Backend (Model Serving)**: A high-performance **FastAPI** REST API serves real-time predictions. Deployed automatically to **Render**.
-5. **Frontend (User Interface)**: A premium, interactive dashboard built with **Streamlit** and **Plotly**. Deployed on **Streamlit Cloud**.
-6. **Model Monitoring**: **Evidently AI** simulates production data drift and generates interactive HTML reports to monitor data health and model performance degradation.
+- **🎨 Frontend UI (Streamlit):** [Interactive Churn Predictor](https://customer-churn-fastapi.streamlit.app/)
+  *Try entering different customer profiles to see the gauge chart and dynamic risk alerts in action!*
+- **⚙️ Backend API (FastAPI Docs):** [API Swagger Documentation](https://customer-churn-fastapi-vwp1.onrender.com/docs)
+  *Test the live REST API endpoints directly from your browser.*
+- **📈 Experiment Tracking (DagsHub/MLflow):** [DagsHub Repository](https://dagshub.com/ahmadtanveer2375/Customer_Churn_Track) | [MLflow UI](https://dagshub.com/ahmadtanveer2375/Customer_Churn_Track.mlflow/)
+  *View the logged hyperparameters, metrics (ROC-AUC, Accuracy), and serialized model versions.*
 
 ---
 
-## 📂 Project Structure
+## 🏗️ Project Architecture & MLOps Lifecycle
+
+This project is decoupled into discrete services, managing the full ML lifecycle from data ingestion to post-deployment monitoring. 
+
+### 1. Data Version Control (DVC) 🗃️
+In professional environments, pushing large datasets and model files (`.csv`, `.pkl`) to Git bloats the repository. We implemented **DVC** to handle this:
+- **How it works:** DVC tracks data files (like `artifacts/scaler.pkl` and `models/voting_soft.pkl`) generating tiny `.dvc` tracking files. 
+- **Storage:** The heavy files are stored remotely in an S3-compatible DagsHub storage bucket, while Git only tracks the lightweight `.dvc` files. 
+- **Benefit:** Anyone cloning this repository can simply run `dvc pull` to fetch the exact model state for any commit in history without overloading GitHub.
+
+### 2. Experiment Tracking & Model Registry (MLflow + DagsHub) 🧪
+Machine Learning requires dozens of iterations (tuning hyper-parameters, trying algorithms).
+- **Implementation:** Integrated **MLflow** into `src/train.py`.
+- **Remote Server:** Connected MLflow to a remote **DagsHub** tracking URI.
+- **What is tracked:** 
+  - *Parameters:* Model configurations (e.g., XGBoost `learning_rate`, Random Forest `n_estimators`).
+  - *Metrics:* `roc_auc_score` and `accuracy_score`.
+  - *Artifacts:* The serialized `VotingClassifier` ensemble model and `StandardScaler` are saved directly to the remote registry.
+
+### 3. Machine Learning Engineering 🤖
+- **Algorithm:** Uses a powerful **Soft Voting Ensemble Classifier** combining:
+  1. `LogisticRegression` (for linear baseline interpretability)
+  2. `RandomForestClassifier` (for handling non-linear interactions)
+  3. `XGBoost` (for high-performance gradient boosting)
+- **Class Imbalance:** Handled using `scale_pos_weight` and `class_weight="balanced"`.
+- **Pipeline:** Features are mathematically scaled using `StandardScaler` ensuring robust gradient descent.
+
+### 4. High-Performance Model Serving (FastAPI Backend) ⚡
+Models in notebooks are useless if other applications can't communicate with them.
+- **API Framework:** Built a RESTful API using **FastAPI** (`main.py`).
+- **Validation:** Uses **Pydantic** (`users_schema.py`) to strictly validate incoming JSON payloads, ensuring the API cannot break due to bad data.
+- **Deployment:** Automatically deployed to **Render** via a CI/CD pipeline triggered by Git pushes.
+
+### 5. Interactive Dashboard (Streamlit Frontend) 📊
+- **UI Architecture:** Built an aesthetic, premium dashboard using **Streamlit** (`streamlit_app.py`).
+- **Communication:** The frontend makes HTTP POST requests to the FastAPI backend to fetch predictions.
+- **Visuals:** Uses **Plotly** to render dynamic risk gauge charts and conditional UI alerts (Red for high risk, Green for safe).
+- **Deployment:** Deployed on **Streamlit Cloud**, automatically redeploying on Git updates.
+
+### 6. Production Model Monitoring (Evidently AI) 🕵️‍♂️
+Models degrade in production as the real world changes (Data Drift). We implemented **Day-2 Operations monitoring**.
+- **Implementation:** `src/monitor.py` simulates a production scenario where incoming data drifts (e.g., lower average tenure, higher monthly charges).
+- **Reports:** It uses **Evidently AI** presets (`DataDriftPreset`, `ClassificationPreset`) to mathematically detect data shift.
+- **Outputs:** Generates stunning interactive HTML dashboards (saved in `reports/`) analyzing which specific features drifted and how the model's accuracy degraded.
+
+---
+
+## 📂 Repository Structure
 
 ```text
 ├── artifacts/             # Scalers and feature names (Tracked by DVC)
 ├── models/                # Trained ensemble models (Tracked by DVC)
 ├── reports/               # Evidently AI HTML drift and performance reports
-├── src/                   # Core ML code
-│   ├── data_prep.py       # Data cleaning and preprocessing
+│   ├── data_drift_report.html
+│   └── model_performance_report.html
+├── src/                   # Core Machine Learning Code
+│   ├── data_prep.py       # Data cleaning and categorical encoding
 │   ├── train.py           # Model training and MLflow tracking
 │   └── monitor.py         # Evidently AI drift simulation and reporting
-├── main.py                # FastAPI backend service
+├── .env.example           # Template for MLflow/DagsHub credentials
+├── main.py                # FastAPI backend serving application
 ├── streamlit_app.py       # Streamlit frontend dashboard
-├── users_schema.py        # Pydantic data validation schemas
-├── render.yaml            # Render deployment configuration
-└── .env.example           # Environment variables template
+├── users_schema.py        # Pydantic schemas for data validation
+├── render.yaml            # Render continuous deployment configuration
+└── requirements.txt       # Unified Python dependencies
 ```
 
 ---
 
-## 💻 Local Setup
+## 💻 Local Development Setup
+
+Want to run this entire MLOps pipeline on your own machine?
 
 ### 1. Clone the repository
 ```bash
@@ -63,55 +111,42 @@ pip install -r requirements.txt
 ### 3. Environment Variables
 Create a `.env` file in the root directory based on `.env.example`:
 ```env
+# Required for running src/train.py to log to remote DagsHub
 MLFLOW_TRACKING_USERNAME=your_dagshub_username
 MLFLOW_TRACKING_PASSWORD=your_dagshub_token
 ```
 
-### 4. Pull Data and Models using DVC
+### 4. Fetch the Models (DVC)
+Pull the large `.pkl` artifacts and models from remote storage:
 ```bash
 dvc pull
 ```
 
-### 5. Run the Backend API (FastAPI)
+### 5. Run the Backend API
+Start the FastAPI server. It will load the models and expose the `/predict` endpoint:
 ```bash
 uvicorn main:app --reload
 ```
-The API will be available at `http://127.0.0.1:8000`.
+*(The API will run at `http://127.0.0.1:8000`)*
 
-### 6. Run the Frontend (Streamlit)
-In a new terminal window:
+### 6. Run the Frontend Dashboard
+In a new terminal, start the UI:
 ```bash
 streamlit run streamlit_app.py
 ```
-The UI will open at `http://localhost:8501`.
+*(The UI will open in your browser at `http://localhost:8501`)*
 
----
-
-## 📊 Model Monitoring
-
-This project uses **Evidently AI** to generate comprehensive HTML reports monitoring the health of the model in production. 
-
-To simulate production drift and generate reports:
+### 7. Run Model Monitoring (Evidently AI)
+Generate data drift HTML reports based on simulated production drift:
 ```bash
 python src/monitor.py
 ```
-This generates three reports in the `reports/` folder:
-- `data_drift_report.html`: Analysis of data distribution shifts.
-- `model_performance_report.html`: Classification metrics comparison.
+*(Open the newly generated `.html` files in `reports/` in your browser!)*
 
 ---
 
-## 🛠️ Tech Stack
-
-- **Data Science**: Pandas, NumPy, Scikit-Learn, XGBoost
-- **MLOps**: MLflow, DVC, DagsHub, Evidently AI
-- **Backend**: FastAPI, Uvicorn, Pydantic
-- **Frontend**: Streamlit, Plotly
-- **Deployment**: Render, Streamlit Cloud
-
----
-
-## 👨‍💻 Author
+## 👨‍💻 Developed By
 
 **Ahmad Tanveer** 
 - GitHub: [@CodxAhmad](https://github.com/CodxAhmad)
+- Project Focus: MLOps, Machine Learning Engineering, Full-Stack Data Science
